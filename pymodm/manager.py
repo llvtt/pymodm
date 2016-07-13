@@ -21,6 +21,14 @@ from pymodm.queryset import QuerySet
 
 
 class BaseManager(object):
+    """Base class for all Managers.
+
+    Managers are responsible for creating
+    :class:`~pymodm.queryset.QuerySet` objects and can be extended to
+    return custom QuerySets. This is an easy way to add new
+    collection-level behavior.
+    """
+
     # Creation counter to keep track of order within a Model.
     __creation_counter = 0
 
@@ -42,6 +50,7 @@ class BaseManager(object):
 
     @property
     def creation_order(self):
+        """The order in which this Manager instance was created."""
         return self.__counter
 
     @classmethod
@@ -63,16 +72,19 @@ class BaseManager(object):
 
     @classmethod
     def from_queryset(cls, queryset_class, class_name=None):
-        """Create a Manager that delegates methods to the given QuerySet class.
+        """Create a Manager that delegates methods to the given
+        :class:`~pymodm.queryset.QuerySet` class.
 
-        The type of the Manager is a subclass of this Manager.
+        The Manager class returned is a subclass of this Manager class.
 
         :parameters:
-          - `queryset_class` The QuerySet class to be instantiated by the
+          - `queryset_class`: The QuerySet class to be instantiated by the
             Manager.
-          - `class_name` The name of the Manager class. If one is not provided,
-            the name of the Manager will be XXXFromYYY, where XXX is the name
-            of this Manager class, and YYY is the name of the QuerySet class.
+          - `class_name`: The name of the Manager class. If one is not provided,
+            the name of the Manager will be `XXXFromYYY`, where `XXX`
+            is the name of this Manager class, and YYY is the name of the
+            QuerySet class.
+
         """
         if class_name is None:
             class_name = '%sFrom%s' % (cls.__name__, queryset_class.__name__)
@@ -87,4 +99,10 @@ class BaseManager(object):
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):
+    """The default manager used for :class:`~pymodm.MongoModel` instances.
+
+    This Manager class (accessed via the ``objects`` attribute on the MongoModel
+    class) is used by default for all MongoModel classes, unless another Manager
+    instance is supplied as an attribute within the MongoModel definition.
+    """
     pass

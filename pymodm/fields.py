@@ -59,10 +59,16 @@ from pymodm.vendor import parse_datetime
 
 
 class CharField(MongoBaseField):
-    """A unicode string field."""
+    """A field that stores unicode strings."""
 
     def __init__(self, verbose_name=None, mongo_name=None,
                  min_length=None, max_length=None, **kwargs):
+        """
+        :parameters:
+          - `min_length`: The required minimum length of the string.
+          - `max_length`: The required maximum length of the string.
+
+        """
         super(CharField, self).__init__(verbose_name=verbose_name,
                                         mongo_name=mongo_name,
                                         **kwargs)
@@ -80,6 +86,12 @@ class IntegerField(MongoBaseField):
 
     def __init__(self, verbose_name=None, mongo_name=None,
                  min_value=None, max_value=None, **kwargs):
+        """
+        :parameters:
+          - `min_value`: The minimum value that can be stored in this field.
+          - `max_value`: The maximum value that can be stored in this field.
+
+        """
         super(IntegerField, self).__init__(verbose_name=verbose_name,
                                            mongo_name=mongo_name,
                                            **kwargs)
@@ -136,16 +148,14 @@ class BinaryField(MongoBaseField):
     """A field that stores binary data."""
     def __init__(self, subtype=bson.binary.BINARY_SUBTYPE,
                  verbose_name=None, mongo_name=None, **kwargs):
+        """
+        :parameters:
+          - `subtype` - A subtype listed in the :module:`~bson.binary` module.
+
+        """
         super(BinaryField, self).__init__(verbose_name=verbose_name,
                                           mongo_name=mongo_name,
                                           **kwargs)
-        """
-        Create a new BinaryField.
-
-        :parameters:
-          - `subtype` - One of the subtypes listed in the `bson.binary` module.
-
-        """
         self.subtype = subtype
         self.validators.append(validators.validator_for_func(Binary))
 
@@ -207,11 +217,10 @@ class Decimal128Field(MongoBaseField):
     def __init__(self, min_value=None, max_value=None,
                  verbose_name=None, mongo_name=None, **kwargs):
         """
-        Create a new DecimalField.
-
         :parameters:
-          - `min_value` - The minimum value that can be stored in this field.
-          - `max_value` - The maximum value that can be stored in this field.
+          - `min_value`: The minimum value that can be stored in this field.
+          - `max_value`: The maximum value that can be stored in this field.
+
         """
         if not _HAS_DECIMAL128:
             raise ConfigurationError(
@@ -267,17 +276,16 @@ class EmailField(MongoBaseField):
 
 
 class FileField(MongoBaseField):
-    """A field that stores files.
-
-    :parameters:
-      - `storage` - The :class:`~pymodm.files.Storage` implementation to
-        use for saving and opening files.
-
-    """
+    """A field that stores files."""
     _wrapper_class = FieldFile
 
     def __init__(self, verbose_name=None, mongo_name=None,
                  storage=None, **kwargs):
+        """
+        :parameters:
+          - `storage`: The :class:`~pymodm.files.Storage` implementation to
+            use for saving and opening files.
+        """
         super(FileField, self).__init__(verbose_name=verbose_name,
                                         mongo_name=mongo_name,
                                         **kwargs)
@@ -337,6 +345,12 @@ class ImageField(FileField):
 
     def __init__(self, verbose_name=None, mongo_name=None, storage=None,
                  **kwargs):
+        """
+        :parameters:
+          - `storage`: The :class:`~pymodm.files.Storage` implementation to
+            use for saving and opening files.
+
+        """
         if not _HAS_PILLOW:
             raise ConfigurationError(
                 'The PIL or Pillow library must be installed in order '
@@ -349,9 +363,16 @@ class ImageField(FileField):
 
 
 class FloatField(MongoBaseField):
-    """A field that stores Python `float`s."""
+    """A field that stores a Python `float`."""
+
     def __init__(self, verbose_name=None, mongo_name=None,
                  min_value=None, max_value=None, **kwargs):
+        """
+        :parameters:
+          - `min_value`: The minimum value that can be stored in this field.
+          - `max_value`: The maximum value that can be stored in this field.
+
+        """
         super(FloatField, self).__init__(verbose_name=verbose_name,
                                          mongo_name=mongo_name,
                                          **kwargs)
@@ -376,15 +397,25 @@ class FloatField(MongoBaseField):
 class GenericIPAddressField(MongoBaseField):
     """A field that stores IPV4 and/or IPV6 addresses."""
     IPV4 = 0
+    """Accept IPv4 addresses only."""
     IPV6 = 1
+    """Accept IPv6 addresses only."""
     BOTH = 2
+    """Accept both IPv4 and IPv6 addresses."""
 
     def __init__(self, verbose_name=None, mongo_name=None, protocol=BOTH,
                  **kwargs):
         """Field representing IP addresses.
 
         :parameters:
-          - `protocol` What protocol this Field should accept.
+          - `protocol`: What protocol this Field should accept. This should be
+            one of the following:
+
+            * `GenericIPAddressField.IPV4`: Accept IPv4 addresses.
+            * `GenericIPAddressfield.IPV6`: Accept IPv6 addresses.
+            * `GenericIPAddressField.BOTH`: Accept both IPv4/6 addresses
+              (default).
+
         """
         super(GenericIPAddressField, self).__init__(verbose_name=verbose_name,
                                                     mongo_name=mongo_name,
@@ -446,7 +477,7 @@ class URLField(MongoBaseField):
 
 
 class UUIDField(MongoBaseField):
-    """A field that stores :class:`~uuid.UUID`s."""
+    """A field that stores :class:`~uuid.UUID` objects."""
     def __init__(self, verbose_name=None, mongo_name=None, **kwargs):
         super(UUIDField, self).__init__(verbose_name=verbose_name,
                                         mongo_name=mongo_name,
@@ -603,10 +634,10 @@ class ListField(MongoBaseField):
     """A field that stores a list."""
     def __init__(self, field=None, verbose_name=None, mongo_name=None,
                  **kwargs):
-        """Create a new ListField.
-
+        """
         :parameters:
-          - `field` The Field type representing all items in this list.
+          - `field`: The Field type of all items in this list.
+
         """
         super(ListField, self).__init__(verbose_name=verbose_name,
                                         mongo_name=mongo_name,
@@ -884,7 +915,6 @@ class GeometryCollectionField(MongoBaseField):
 #
 
 class EmbeddedDocumentField(RelatedModelFieldsBase):
-
     """A field that stores a document inside another document."""
 
     def __init__(self, model,
@@ -944,27 +974,44 @@ class EmbeddedDocumentListField(RelatedModelFieldsBase):
 
 
 class ReferenceField(RelatedModelFieldsBase):
-    """A field that references another document within a document.
-
-    Options for reference_delete_rule are as follows:
-
-      * DO_NOTHING (0)  - don't do anything (default).
-      * NULLIFY    (1)  - Updates the reference to null.
-      * CASCADE    (2)  - Deletes the documents associated with the reference.
-      * DENY       (3)  - Prevent the deletion of the reference object.
-      * PULL       (4)  - Pull the reference from a
-                          :class:`~pymodm.fields.ListField` of references
-    """
+    """A field that references another document within a document."""
 
     # Delete rules.
     DO_NOTHING = 0
+    """Don't do anything upon deletion."""
     NULLIFY = 1
+    """Set the reference to ``None`` upon deletion."""
     CASCADE = 2
+    """Delete documents associated with the reference."""
     DENY = 3
+    """Disallow deleting objects that are still referenced."""
     PULL = 4
+    """
+    Pull the reference of the deleted object out of a
+    :class:`~pymodm.fields.ListField`
+    """
 
     def __init__(self, model, on_delete=DO_NOTHING,
                  verbose_name=None, mongo_name=None, **kwargs):
+        """
+        :parameters:
+          - `model`: The class of :class:`~pymodm.MongoModel` that this field
+            references.
+          - `on_delete`: The action to take (if any) when the referenced object
+            is deleted. The delete rule should be one of the following:
+
+            * `ReferenceField.DO_NOTHING`: Don't do anything upon deletion
+              (default).
+            * `ReferenceField.NULLIFY`: Set the reference to ``None`` upon
+              deletion.
+            * `ReferenceField.CASCADE`: Delete documents associated with the
+              reference.
+            * `ReferenceField.DENY`: Disallow deleting documents that are still
+              referenced.
+            * `ReferenceField.PULL`: Pull the reference of the deleted document
+              out of a `~pymodm.fields.ListField`.
+
+        """
         super(ReferenceField, self).__init__(model=model,
                                              verbose_name=verbose_name,
                                              mongo_name=mongo_name,

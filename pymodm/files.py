@@ -29,34 +29,44 @@ from gridfs.grid_file import GridIn, DEFAULT_CHUNK_SIZE
 class Storage(object):
     """Abstract class that defines the API for managing files."""
     def open(self, name):
+        """Return the :class:`~pymodm.files.FileldFile` with the given name."""
         raise NotImplementedError
 
     def save(name, content, metadata=None):
+        """Returns the id of the file saved.
+
+        :parameters:
+          - `name`: The name of the file.
+          - `content`: A file-like object, string, or bytes.
+          - `metadata`: Metadata dictionary to be saved with the file.
+
+        """
         raise NotImplementedError
 
     def delete(self, name):
+        """Delete the file with the given name."""
         raise NotImplementedError
 
     def exists(self, name):
+        """Returns ``True`` if the file with the given name exists."""
         raise NotImplementedError
 
 
 class GridFSStorage(Storage):
+    """:class:`~pymodm.files.Storage` class that uses GridFS to store files.
+
+    This is the default Storage implementation for
+    :class:`~pymodm.files.FileField`.
+
+    """
+
     def __init__(self, gridfs_bucket):
         self.gridfs = gridfs_bucket
 
     def open(self, name):
-        """Returns a FieldFile, or some other wrapped class."""
         return GridFSFile(name, self.gridfs)
 
     def save(self, name, content, metadata=None):
-        """Returns the id of the file saved.
-
-        :parameters:
-          - `name` - The name of the file.
-          - `content` - A file-like object, string or bytes.
-          - `metadata` - (optional) Metadata to be saved with the file.
-        """
         gridin_opts = {'filename': name}
         if metadata is not None:
             gridin_opts['metadata'] = metadata
@@ -70,14 +80,12 @@ class GridFSStorage(Storage):
         return gridin._id
 
     def delete(self, name):
-        """Delete the file with the given name."""
         try:
             self.gridfs.delete(name)
         except NoFile:
             pass
 
     def exists(self, name):
-        """Returns ``True`` if the file with given name exists."""
         try:
             self.gridfs.open_download_stream(name)
         except NoFile:
@@ -125,6 +133,8 @@ class File(FileProxyMixin):
     def chunks(self, chunk_size=DEFAULT_CHUNK_SIZE):
         """Read the file and yield chunks of ``chunk_size`` bytes.
 
+        The default chunk size is the same as the default for GridFS.
+
         This method is useful for streaming large files without loading the
         entire file into memory.
 
@@ -142,7 +152,12 @@ class File(FileProxyMixin):
 
 
 class FieldFile(FileProxyMixin):
-    """Wrapper for data stored in a :class:`~pymodm.fields.FileField`."""
+    """Type returned when accessing a :class:`~pymodm.fields.FileField`.
+
+    This type is just a thin wrapper around a :class:`~pymodm.files.File`,
+    can it can be treated as a file-like object in most places where a `file`
+    is expected.
+    """
 
     def __init__(self, instance, field, name):
         self.instance = instance
@@ -154,6 +169,11 @@ class FieldFile(FileProxyMixin):
 
     @property
     def file(self):
+        """Access the underlying :class:`~pymodm.files.File` object.
+
+        This will open the file if necessary.
+
+        """
         if self._file is None:
             self._file = self.storage.open(self.name)
             self._committed = True
@@ -164,6 +184,14 @@ class FieldFile(FileProxyMixin):
         self._file = file
 
     def save(self, name, content):
+        """Save this file.
+
+        :parameters:
+          - `name`: The name of the file.
+          - `content`: The file's contents. This can be a file-like object,
+            string, or bytes.
+
+        """
         if self.metadata is not None:
             self.name = self.storage.save(name, content, self.metadata)
         else:

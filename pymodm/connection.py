@@ -62,7 +62,7 @@ def connect(mongodb_uri, alias=DEFAULT_CONNECTION_ALIAS):
 
 
 def _get_connection(alias=DEFAULT_CONNECTION_ALIAS):
-    """Return a `ConnectionInfo` by connection alias."""
+    """Return the :class:`~pymodm.connection.ConnectionInfo` for the alias."""
     try:
         return _CONNECTIONS[alias]
     except KeyError:
@@ -73,5 +73,5 @@ def _get_connection(alias=DEFAULT_CONNECTION_ALIAS):
 
 
 def _get_db(alias=DEFAULT_CONNECTION_ALIAS):
-    """Return the `pymongo.database.Database` instance for the given alias."""
+    """Return the :class:`~pymongo.database.Database` for the alias."""
     return _get_connection(alias).database

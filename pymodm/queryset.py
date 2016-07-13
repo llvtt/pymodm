@@ -20,13 +20,17 @@ from pymodm.common import (
 
 
 class QuerySet(object):
+    """The default QuerySet type.
+
+    QuerySets handle queries and allow working with documents in bulk.
+    """
 
     def __init__(self, model=None, query=None):
-        """Create a new QuerySet instance.
-
+        """
         :parameters:
-          - `model` The MongoModel class to be produced by the QuerySet.
-          - `query` The MongoDB query that filters the QuerySet.
+          - `model`: The :class:`~pymodm.MongoModel` class to be produced
+            by the QuerySet.
+          - `query`: The MongoDB query that filters the QuerySet.
         """
         self._model = model
         self._query = query or {}
@@ -67,6 +71,30 @@ class QuerySet(object):
 
         Raises `DoesNotExist` if no object was found.
         Raises `MultipleObjectsReturned` if multiple objects were found.
+
+        Note that these exception types are specific to the model class itself,
+        so that it's possible to differentiate Exceptions on the model type::
+
+            try:
+                user = User.objects.get({'_id': user_id})
+                profile = UserProfile.objects.get({'user': user.email})
+            except User.DoesNotExist:
+                # Handle User not existing.
+                return redirect_to_registration(user_id)
+            except UserProfile.DoesNotExist:
+                # User has not set up their profile.
+                return setup_user_profile(user_id)
+
+        These model-specific exceptions all inherit from ones of the same name
+        in the :module:`~pymodm.errors` module, so you can catch them all::
+
+            try:
+                user = User.objects.get({'_id': user_id})
+                profile = UserProfile.objects.get({'user': user.email})
+            except errors.DoesNotExist:
+                # Either the User or UserProfile does not exist.
+                return redirect_to_404(user_id)
+
         """
         results = iter(self.raw(raw_query))
         try:
@@ -119,9 +147,9 @@ class QuerySet(object):
         """Set an ordering for this QuerySet.
 
         :parameters:
-          - `ordering` The sort criteria. This should be a list of 2-tuples
+          - `ordering`: The sort criteria. This should be a list of 2-tuples
             consisting of [(field_name, direction)], where "direction" can
-            be one of `pymongo.ASCENDING` or `pymongo.DESCENDING`.
+            be one of :data:`~pymongo.ASCENDING` or :data:`~pymongo.DESCENDING`.
         """
         clone = self._clone()
         clone._order_by = ordering
@@ -155,8 +183,7 @@ class QuerySet(object):
         return clone
 
     def skip(self, skip):
-        """Skip over the first number of objects in this QuerySet.
-        """
+        """Skip over the first number of objects in this QuerySet."""
         clone = self._clone()
         clone._skip = skip
         return clone
@@ -179,12 +206,12 @@ class QuerySet(object):
         """Save Model instances in bulk.
 
         :parameters:
-          - `object_or_objects` - A list of MongoModel instances or a single
+          - `object_or_objects`: A list of MongoModel instances or a single
             instance.
-          - `retrieve` (optional) - Whether to return the saved MongoModel
+          - `retrieve`: Whether to return the saved MongoModel
             instances. If ``False`` (the default), only the ids will be
             returned.
-          - `full_clean` (optional) - Whether to validate each object by calling
+          - `full_clean`: Whether to validate each object by calling
             the :meth:`~pymodm.MongoModel.full_clean` method before saving.
             This isn't done by default.
         """
@@ -265,6 +292,7 @@ class QuerySet(object):
 
     @property
     def raw_query(self):
+        """The raw query that will be executed by this QuerySet."""
         if self._types_query and self._query:
             return {'$and': [self._query, self._types_query]}
         return self._query or self._types_query
