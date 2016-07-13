@@ -404,7 +404,7 @@ class MongoModel(with_metaclass(TopLevelMongoModelMetaclass, MongoModelBase)):
             replace.
 
         :returns: This object, with the `pk` property filled in if it wasn't
-        already.
+                  already.
 
         """
         cascade = validate_boolean_or_none('cascade', cascade)
@@ -447,13 +447,14 @@ class MongoModel(with_metaclass(TopLevelMongoModelMetaclass, MongoModelBase)):
     def refresh_from_db(self, fields=None):
         """Reload this object from the database.
 
+        :parameters:
+          - `fields`: An iterable of fields to reload. Defaults to all fields.
+
         .. warning:: This method will reload the object from the database,
            with possibly only a few fields set. Calling
            :meth:`~pymodm.MongoModel.save` after this may revert
            or unset fields.
 
-        :parameters:
-          - `fields`: An iterable of fields to reload. Defaults to all fields.
         """
         fields = validate_list_tuple_or_none('fields', fields)
         if self._qs is None:

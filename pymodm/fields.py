@@ -150,7 +150,7 @@ class BinaryField(MongoBaseField):
                  verbose_name=None, mongo_name=None, **kwargs):
         """
         :parameters:
-          - `subtype` - A subtype listed in the :module:`~bson.binary` module.
+          - `subtype`: A subtype listed in the :mod:`~bson.binary` module.
 
         """
         super(BinaryField, self).__init__(verbose_name=verbose_name,

@@ -86,7 +86,7 @@ class QuerySet(object):
                 return setup_user_profile(user_id)
 
         These model-specific exceptions all inherit from ones of the same name
-        in the :module:`~pymodm.errors` module, so you can catch them all::
+        in the :mod:`~pymodm.errors` module, so you can catch them all::
 
             try:
                 user = User.objects.get({'_id': user_id})
