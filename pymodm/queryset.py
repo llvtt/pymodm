@@ -308,11 +308,11 @@ class QuerySet(object):
     def __iter__(self):
         if self._return_raw:
             return self._get_raw_cursor()
-        to_instance = self._model.from_dict
+        to_instance = self._model.from_document
         if self._select_related_fields is not None:
             dereference = _import('pymodm.dereference.dereference')
             to_instance = lambda doc: dereference(
-                self._model.from_dict(doc), self._select_related_fields)
+                self._model.from_document(doc), self._select_related_fields)
         return (to_instance(doc) for doc in self._get_raw_cursor())
 
     def __next__(self):

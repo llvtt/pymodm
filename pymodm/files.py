@@ -29,7 +29,7 @@ from gridfs.grid_file import GridIn, DEFAULT_CHUNK_SIZE
 class Storage(object):
     """Abstract class that defines the API for managing files."""
     def open(self, name):
-        """Return the :class:`~pymodm.files.FileldFile` with the given name."""
+        """Return the :class:`~pymodm.files.FieldFile` with the given name."""
         raise NotImplementedError
 
     def save(name, content, metadata=None):
@@ -93,7 +93,7 @@ class GridFSStorage(Storage):
         return True
 
 
-class FileProxyMixin(object):
+class _FileProxyMixin(object):
     """Proxy methods from an underlying file."""
     def __getattr__(self, attr):
         try:
@@ -104,7 +104,7 @@ class FileProxyMixin(object):
                     self.__class__.__name__, attr))
 
 
-class File(FileProxyMixin):
+class File(_FileProxyMixin):
     """Wrapper around a Python `file`.
 
     This class may be assigned directly to a FileField.
@@ -151,7 +151,7 @@ class File(FileProxyMixin):
             yield data
 
 
-class FieldFile(FileProxyMixin):
+class FieldFile(_FileProxyMixin):
     """Type returned when accessing a :class:`~pymodm.fields.FileField`.
 
     This type is just a thin wrapper around a :class:`~pymodm.files.File`,
@@ -169,7 +169,7 @@ class FieldFile(FileProxyMixin):
 
     @property
     def file(self):
-        """Access the underlying :class:`~pymodm.files.File` object.
+        """The underlying :class:`~pymodm.files.File` object.
 
         This will open the file if necessary.
 
@@ -220,8 +220,15 @@ class FieldFile(FileProxyMixin):
 
 
 class ImageFieldFile(FieldFile):
+    """Type returned when accessing a :class:`~pymodm.fields.ImageField`.
+
+    This type is very similar to :class:`~pymodm.files.FieldFile`, except that
+    it provides a few convenience properties for the underlying image.
+    """
+
     @property
     def image(self):
+        """The underlying image."""
         if Image is None:
             raise ConfigurationError(
                 'PIL or Pillow must be installed to access the "image" '
@@ -232,14 +239,17 @@ class ImageFieldFile(FieldFile):
 
     @property
     def width(self):
+        """The width of the image in pixels."""
         return self.image.width
 
     @property
     def height(self):
+        """The height of the image in pixels."""
         return self.image.height
 
     @property
     def format(self):
+        """The format of the image as a string."""
         return self.image.format
 
 

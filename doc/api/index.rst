@@ -34,3 +34,6 @@ Welcome to the PyMODM API documentation.
 .. automodule:: pymodm.files
    :members:
    :undoc-members:
+
+.. automodule:: pymodm.context_managers
+   :members:

@@ -405,8 +405,7 @@ class GenericIPAddressField(MongoBaseField):
 
     def __init__(self, verbose_name=None, mongo_name=None, protocol=BOTH,
                  **kwargs):
-        """Field representing IP addresses.
-
+        """
         :parameters:
           - `protocol`: What protocol this Field should accept. This should be
             one of the following:
@@ -934,7 +933,7 @@ class EmbeddedDocumentField(RelatedModelFieldsBase):
     def to_python(self, value):
         if isinstance(value, dict):
             # Try to convert the value into our document type.
-            return self.related_model.from_dict(value)
+            return self.related_model.from_document(value)
         return value
 
     def to_mongo(self, value):
@@ -965,7 +964,7 @@ class EmbeddedDocumentListField(RelatedModelFieldsBase):
                 self.validators.append(validate_related_model)
 
     def to_python(self, value):
-        return [self.related_model.from_dict(item)
+        return [self.related_model.from_document(item)
                 if isinstance(item, dict) else item
                 for item in value]
 
@@ -1047,7 +1046,7 @@ class ReferenceField(RelatedModelFieldsBase):
     def to_python(self, value):
         if isinstance(value, dict):
             # Try to convert the value into our document type.
-            return self.related_model.from_dict(value)
+            return self.related_model.from_document(value)
         elif isinstance(value, self.related_model):
             return value
         elif self.model._mongometa._auto_dereference:

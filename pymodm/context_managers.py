@@ -14,7 +14,19 @@
 
 
 class switch_connection(object):
-    """Change the active connection for a Model."""
+    """Context manager that changes the active connection for a Model.
+
+    Example::
+
+        connect('mongodb://.../mainDatabase', alias='main-app')
+        connect('mongodb://.../backupDatabase', alias='backup')
+
+        # 'MyModel' normally writes to 'mainDatabase'. Let's change that.
+        with switch_connection(MyModel, 'backup'):
+            # This goes to 'backupDatabase'.
+            MyModel(name='Bilbo').save()
+
+    """
 
     def __init__(self, model, connection_alias):
         self.model = model
@@ -30,7 +42,18 @@ class switch_connection(object):
 
 
 class switch_collection(object):
-    """Change the active collection for a Model."""
+    """Context manager that changes the active collection for a Model.
+
+    :parameters:
+      - `model`:  A :class:`~pymodm.MongoModel` class.
+      - `collection_name`: The name of the new collection to use.
+
+    Example::
+
+        with switch_collection(MyModel, "other_collection"):
+            ...
+
+    """
 
     def __init__(self, model, collection_name):
         self.model = model
@@ -46,7 +69,28 @@ class switch_collection(object):
 
 
 class collection_options(object):
-    """Change collections options for a Model."""
+    """Context manager that changes the collections options for a Model.
+
+    :parameters:
+      - `model`: A :class:`~pymodm.MongoModel` class.
+      - `codec_options`: An instance of
+        :class:`~bson.codec_options.CodecOptions`.
+      - `read_preference`: A read preference from the
+        :mod:`~pymongo.read_preferences` module.
+      - `write_concern`: An instance of
+        :class:`~pymongo.write_concern.WriteConcern`.
+      - `read_concern`: An instance of
+        :class:`~pymongo.read_concern.ReadConcern`.
+
+    Example::
+
+        with collection_options(
+                MyModel,
+                read_preference=ReadPreference.SECONDARY):
+            # Read objects off of a secondary.
+            MyModel.objects.raw(...)
+
+    """
 
     def __init__(self, model, codec_options=None, read_preference=None,
                  write_concern=None, read_concern=None):
@@ -83,14 +127,28 @@ class collection_options(object):
 
 
 class no_auto_dereference(object):
-    """Turn off automatic dereferencing for a model class."""
+    """Context manager that turns off automatic dereferencing.
 
-    def __init__(self, klass):
-        self.klass = klass
-        self.orig_auto_deref = self.klass._mongometa.auto_dereference
+    :parameters:
+      - `model`:  A :class:`~pymodm.MongoModel` class.
+
+    Example::
+
+        >>> some_profile = UserProfile.objects.first()
+        >>> with no_auto_dereference(UserProfile):
+        ...     some_profile.user
+        ObjectId('5786cf1d6e32ab419952fce4')
+        >>> some_profile.user
+        User(name='Sammy', points=123)
+
+    """
+
+    def __init__(self, model):
+        self.model = model
+        self.orig_auto_deref = self.model._mongometa.auto_dereference
 
     def __enter__(self):
-        self.klass._mongometa.auto_dereference = False
+        self.model._mongometa.auto_dereference = False
 
     def __exit__(self, typ, val, tb):
-        self.klass._mongometa.auto_dereference = self.orig_auto_deref
+        self.model._mongometa.auto_dereference = self.orig_auto_deref

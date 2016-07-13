@@ -228,9 +228,9 @@ class MongoModelBase(object):
 
         :parameters:
           - `document`: A Python dictionary describing a MongoDB document.
-             Fields within the document should be named according to each model
-             field's `mongo_name` attribute, rather than the field's Python
-             name.
+            Fields within the document should be named according to each model
+            field's `mongo_name` attribute, rather than the field's Python
+            name.
 
         """
         dct = validate_mapping('document', document)
@@ -245,7 +245,7 @@ class MongoModelBase(object):
     def to_son(self):
         """Get this Model back as a SON object.
 
-        :returns: a SON object representing thi object as a MongoDB document.
+        :returns: SON representing this object as a MongoDB document.
 
         """
         son = SON()
@@ -341,9 +341,9 @@ class MongoModel(with_metaclass(TopLevelMongoModelMetaclass, MongoModelBase)):
       ...     email = fields.EmailField(primary_key=True)
       ...     name = fields.CharField()
       >>> # Using positional arguments:
-      >>> jane = User('jane@examplesarehard.net', 'Jane')
+      >>> jane = User('jane@janesemailaddress.net', 'Jane')
       >>> # Keyword arguments:
-      >>> roy = User(name='Roy', email='roy@examplesarehard.net')
+      >>> roy = User(name='Roy', email='roy@roysemailaddress.net')
 
     Note that creating an instance of MongoModel does not create a document
     in the database.
