@@ -38,6 +38,10 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
 ]
+# Include __init__ comments in documentation for class.
+autoclass_content = 'both'
+# mapping of identifier -> (target, inventory)
+intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

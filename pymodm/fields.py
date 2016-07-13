@@ -410,10 +410,9 @@ class GenericIPAddressField(MongoBaseField):
           - `protocol`: What protocol this Field should accept. This should be
             one of the following:
 
-            * `GenericIPAddressField.IPV4`: Accept IPv4 addresses.
-            * `GenericIPAddressfield.IPV6`: Accept IPv6 addresses.
-            * `GenericIPAddressField.BOTH`: Accept both IPv4/6 addresses
-              (default).
+            * `GenericIPAddressField.IPV4`
+            * `GenericIPAddressfield.IPV6`
+            * `GenericIPAddressField.BOTH` (default).
 
         """
         super(GenericIPAddressField, self).__init__(verbose_name=verbose_name,
@@ -999,16 +998,11 @@ class ReferenceField(RelatedModelFieldsBase):
           - `on_delete`: The action to take (if any) when the referenced object
             is deleted. The delete rule should be one of the following:
 
-            * `ReferenceField.DO_NOTHING`: Don't do anything upon deletion
-              (default).
-            * `ReferenceField.NULLIFY`: Set the reference to ``None`` upon
-              deletion.
-            * `ReferenceField.CASCADE`: Delete documents associated with the
-              reference.
-            * `ReferenceField.DENY`: Disallow deleting documents that are still
-              referenced.
-            * `ReferenceField.PULL`: Pull the reference of the deleted document
-              out of a `~pymodm.fields.ListField`.
+            * `ReferenceField.DO_NOTHING` (default).
+            * `ReferenceField.NULLIFY`
+            * `ReferenceField.CASCADE`
+            * `ReferenceField.DENY`
+            * `ReferenceField.PULL`
 
         """
         super(ReferenceField, self).__init__(model=model,

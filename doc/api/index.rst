@@ -25,7 +25,11 @@ Welcome to the PyMODM API documentation.
 
 .. automodule:: pymodm.fields
    :members:
-   :exclude-members: GeoJSONField, ReferenceField
+   :exclude-members: GeoJSONField, ReferenceField, GenericIPAddressField
+
+   .. autoclass:: GenericIPAddressField
+      :members:
+      :member-order: bysource
 
    .. autoclass:: ReferenceField
       :members:
