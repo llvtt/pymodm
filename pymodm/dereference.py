@@ -161,8 +161,8 @@ def dereference(model_instance, fields=None):
     efficient than dereferencing one field at a time.
 
     :parameters:
-      - `model_instance` The MongoModel instance.
-      - `fields` (optional) An iterable of field names in "dot" notation that
+      - `model_instance`: The MongoModel instance.
+      - `fields`: An iterable of field names in "dot" notation that
         should be dereferenced. If left blank, all fields will be dereferenced.
     """
     # Map of collection name --> list of ids to retrieve from the collection.
@@ -191,8 +191,8 @@ def dereference_id(model_class, model_id):
     """Dereference a single object by id.
 
     :parameters:
-      - `model_class` - The class of a model to be dereferenced.
-      - `model_id` - The id of the model to be dereferenced.
+      - `model_class`: The class of a model to be dereferenced.
+      - `model_id`: The id of the model to be dereferenced.
     """
     collection = model_class._mongometa.collection
     return model_class.from_document(collection.find_one(model_id))
