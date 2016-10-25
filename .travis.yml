@@ -18,8 +18,7 @@ matrix:
 install:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz
   - tar xzf mongodb-linux-x86_64-${MONGODB}.tgz
-  - export PATH=${PWD}/mongodb-linux-x86_64-${MONGODB}/bin:${PATH}
-  - mongod --version
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB}/bin/mongod --version
   - pip install Pillow
   - python setup.py install
 
