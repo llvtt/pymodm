@@ -1,0 +1,36 @@
+language: python
+python:
+  - 2.7
+  - 3.3
+  - 3.4
+  - 3.5
+
+env:
+  global:
+    - MO_ADDRESS=127.0.0.1:20000
+  matrix:
+    - MONGODB=2.6.12
+    - MONGODB=3.0.12
+    - MONGODB=3.2.10
+    - MONGODB=3.4.0-rc0
+
+matrix:
+  fast_finish: true
+
+install:
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz
+  - tar xzf mongodb-linux-x86_64-${MONGODB}.tgz
+  - export PATH=${PWD}/mongodb-linux-x86_64-${MONGODB}/bin:${PATH}
+  - mongod --version
+  - pip install Pillow
+  - python setup.py install
+  - pip install mongo-orchestration
+
+before_script:
+  - mongo-orchestration start
+
+script:
+  - python setup.py test
+
+after_script:
+  - mongo-orchestration stop
