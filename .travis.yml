@@ -6,8 +6,6 @@ python:
   - 3.5
 
 env:
-  global:
-    - MO_ADDRESS=127.0.0.1:20000
   matrix:
     - MONGODB=2.6.12
     - MONGODB=3.0.12
@@ -24,13 +22,13 @@ install:
   - mongod --version
   - pip install Pillow
   - python setup.py install
-  - pip install mongo-orchestration
 
 before_script:
-  - mongo-orchestration start
+  - mkdir ${PWD}/mongodb-linux-x86_64-${MONGODB}/data
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB}/bin/mongod --dbpath ${PWD}/mongodb-linux-x86_64-${MONGODB}/data --logpath ${PWD}/mongodb-linux-x86_64-${MONGODB}/mongodb.log --fork
 
 script:
   - python setup.py test
 
 after_script:
-  - mongo-orchestration stop
+  - pkill mongod
